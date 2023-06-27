@@ -1,25 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { Row, Col } from "antd";
+import SearchComponent from "./SearchComponent";
+import CardComponent from "./CardComponent";
+import dummyData from "./data"; // Import the dummy data from data.js
 
-function App() {
+const App = () => {
+  const [searchText, setSearchText] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
+
+  const handleLocationChange = (value) => {
+    setSelectedLocation(value);
+  };
+
+  const filteredData = dummyData.filter((data) => {
+    const isMatchedName = data.name
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
+
+    if (selectedLocation && selectedLocation !== "all") {
+      const isMatchedLocation = data.locations.includes(selectedLocation);
+      return isMatchedName && isMatchedLocation;
+    }
+
+    return isMatchedName;
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: "24px" }}>
+      <Row gutter={[24, 24]}>
+        <SearchComponent
+          onSearch={handleSearch}
+          onLocationChange={handleLocationChange}
+        />
+        <Col span={16}>
+          <Row gutter={[24, 24]}>
+            {filteredData.map((data, index) => (
+              <CardComponent data={data} key={index} />
+            ))}
+          </Row>
+        </Col>
+      </Row>
     </div>
   );
-}
+};
 
 export default App;
